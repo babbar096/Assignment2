@@ -10,6 +10,7 @@ import UIKit
 class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
     var pickerdata = ["Courtside","Balcony Level","Lower Level"]
+    var numberOfTickets = ["12", "20", "15"]
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1;
@@ -21,19 +22,33 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         let selectedOption = pickerdata[row]
-        let numberOfTickets = ["12", "20", "15"]
-        let prices = [27777, 1170, 10434]
+        let ticketCount = numberOfTickets[row]
+        let price = getPrice(for: selectedOption)
         
-        let ticketText = "\(selectedOption), \(numberOfTickets[row]) tickets, $\(prices[row])"
+        let ticketText = "\(selectedOption), \(ticketCount) tickets, $\(price)"
         return ticketText
     }
+
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedOption = pickerdata[row]
         priceType.text = selectedOption
+        totalTickets.text = ""
+        // Update the number of tickets in the selected row
+        let remainingTickets = Int(numberOfTickets[row]) ?? 0
+        
     }
 
 
-
+    func getPrice(for option: String) -> Int {
+            if option == "Courtside" {
+                return 27777
+            } else if option == "Balcony Level" {
+                return 1170
+            } else {
+                return 10434
+            }
+        }
 
 
     
@@ -66,32 +81,38 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
        
        
     @IBAction func Buy(_ sender: Any) {
-        let selectedOption = pickerdata[ticketType.selectedRow(inComponent: 0)]
-        var price = 0
-        var result = 0
+        let selectedRow = ticketType.selectedRow(inComponent: 0)
+        let selectedOption = pickerdata[selectedRow]
         
-        if let quantity = Int(totalTickets.text ?? "0") {
-            if selectedOption == "Courtside" {
-                price = 27777
-            } else if selectedOption == "Balcony Level" {
-                price = 1170
-            } else {
-                price = 10434
-            }
-            
-            result = price * quantity
+        guard let quantity = Int(totalTickets.text ?? "0") else {
+            totalPrice.text = "Invalid Input"
+            return
+        }
+        
+        let availableTickets = Int(numberOfTickets[selectedRow]) ?? 0
+        
+        if quantity > availableTickets {
+            totalPrice.text = "Not enough tickets available"
+        } else {
+            let price = getPrice(for: selectedOption)
+            let result = price * quantity
             totalPrice.text = String(result)
             
-        } else {
-            totalPrice.text = "Invalid Input"
+            // Update the number of tickets in the selected row
+            numberOfTickets[selectedRow] = String(availableTickets - quantity)
+            ticketType.reloadAllComponents()
+            
+            // Reset the selected row to the first row (0 index) if available
+            if pickerdata.indices.contains(0) {
+                ticketType.selectRow(0, inComponent: 0, animated: false)
+                priceType.text = pickerdata[0]
+            } else {
+                priceType.text = ""
+            }
         }
     }
 
 
-
-
-
-    
     @IBAction func Zero(_ sender: Any) {
         totalTickets.text?.append("0")
     }
