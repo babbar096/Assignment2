@@ -20,18 +20,17 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-            let selectedOption = pickerdata[row]
-            if selectedOption == "Courtside" {
-                priceType.text = "Courtside"
-            } else if selectedOption == "Balcony Level" {
-                priceType.text = "Balcony Level"
-            } else {
-                priceType.text = "Lower Level"
-            }
-            
-            let ticketText = "\(pickerdata[row]) \(totalTickets.text) \(totalPrice.text)"
-            return ticketText
-        }
+        let selectedOption = pickerdata[row]
+        let numberOfTickets = ["12", "20", "15"]
+        let prices = [27777, 1170, 10434]
+        
+        let ticketText = "\(selectedOption), \(numberOfTickets[row]) tickets, $\(prices[row])"
+        return ticketText
+    }
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let selectedOption = pickerdata[row]
+        priceType.text = selectedOption
+    }
 
 
 
@@ -55,13 +54,6 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         totalTickets.text = ""
         ticketType.dataSource = self
         ticketType.delegate = self
-        
-        // Find the index of the initial/default value in the pickerdata array
-        let defaultRow = pickerdata.firstIndex(of: "Courtside") ?? 0
-        
-        // Set the initial/default value for the UIPickerView
-        ticketType.selectRow(defaultRow, inComponent: 0, animated: false)
-        priceType.text = pickerdata[defaultRow]
     }
 
 
@@ -73,30 +65,29 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
        }
        
        
-       @IBAction func Buy(_ sender: Any) {
-           
-           let selectedOption = pickerdata[ticketType.selectedRow(inComponent: 0)]
-           var price = 0
-           var result = 0
-           if let quantity = Int(totalTickets.text ?? "0"){
-               if priceType.text == "Courtside"{
-                   price = 27777
-               } else if priceType.text == "Balcony Level"{
-                   price = 1170
-               } else{
-                   price = 10434
-               }
-               result = price * quantity
-               totalPrice.text = String(result)
-               
-               var newPickerValue = " \(selectedOption) \(totalTickets.text) \(totalPrice.text)"
-               pickerdata[ticketType.selectedRow(inComponent: 0)] = newPickerValue
-               ticketType.reloadAllComponents()
-           } else{
-               totalPrice.text = "Invalid Input"
-           }
-           
-       }
+    @IBAction func Buy(_ sender: Any) {
+        let selectedOption = pickerdata[ticketType.selectedRow(inComponent: 0)]
+        var price = 0
+        var result = 0
+        
+        if let quantity = Int(totalTickets.text ?? "0") {
+            if selectedOption == "Courtside" {
+                price = 27777
+            } else if selectedOption == "Balcony Level" {
+                price = 1170
+            } else {
+                price = 10434
+            }
+            
+            result = price * quantity
+            totalPrice.text = String(result)
+            
+        } else {
+            totalPrice.text = "Invalid Input"
+        }
+    }
+
+
 
 
 
