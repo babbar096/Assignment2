@@ -80,11 +80,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
            var result = 0
            if let quantity = Int(totalTickets.text ?? "0"){
                if priceType.text == "Courtside"{
-                   price = 20000
+                   price = 27777
                } else if priceType.text == "Balcony Level"{
-                   price = 10000
+                   price = 1170
                } else{
-                   price = 5000
+                   price = 10434
                }
                result = price * quantity
                totalPrice.text = String(result)
